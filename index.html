@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TailorCV – AI Resume Feedback for Your Exact Job</title>
+  <link rel="stylesheet" href="style.css?v=2" />
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Novus.ai analytics — PASTE YOUR SCRIPT TAG ON THE LINE BELOW
+       ═══════════════════════════════════════════════════════════════════ -->
+  <!-- <script src="https://cdn.novus.ai/YOUR_PROJECT_ID.js" async></script> -->
+
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="no-print">
+    <div class="logo">Tailor<span>CV</span></div>
+    <p class="tagline">AI-powered resume feedback tailored to your exact job description</p>
+  </header>
+
+  <main>
+
+    <!-- ── API KEY NOTICE (auto-shown when key is still placeholder) ── -->
+    <div id="keyNotice" class="key-notice hidden">
+      <strong>⚠️ Setup required:</strong> Open <code>script.js</code> and replace
+      <code>YOUR_API_KEY_HERE</code> with your Claude API key to enable analysis.
+    </div>
+
+    <!-- ── INPUTS ── -->
+    <section class="input-section no-print">
+
+      <!-- Resume -->
+      <div class="input-card">
+        <label>📄 Your Resume</label>
+
+        <div class="drop-zone" id="resumeDropZone" role="button" tabindex="0"
+             aria-label="Drop resume PDF or click to upload">
+          <span class="drop-icon">⬆</span>
+          <span class="drop-text">Drag &amp; drop PDF / TXT or
+            <strong>click to upload</strong>
+          </span>
+          <input type="file" id="resumeFile" accept=".pdf,.txt" hidden />
+          <span class="drop-filename" id="resumeFilename"></span>
+        </div>
+
+        <div class="drop-or">— or paste below —</div>
+        <textarea id="resume" placeholder="Paste your resume text here…"></textarea>
+        <div class="counter" id="resumeCounter">0 words · 0 chars</div>
+      </div>
+
+      <!-- Job Description -->
+      <div class="input-card">
+        <label>🎯 Job Description</label>
+
+        <div class="drop-zone" id="jdDropZone" role="button" tabindex="0"
+             aria-label="Drop job description file or click to upload">
+          <span class="drop-icon">⬆</span>
+          <span class="drop-text">Drag &amp; drop PDF / TXT or
+            <strong>click to upload</strong>
+          </span>
+          <input type="file" id="jdFile" accept=".pdf,.txt" hidden />
+          <span class="drop-filename" id="jdFilename"></span>
+        </div>
+
+        <div class="drop-or">— or paste below —</div>
+        <textarea id="jobdesc" placeholder="Paste the job description you're targeting…"></textarea>
+        <div class="counter" id="jobdescCounter">0 words · 0 chars</div>
+      </div>
+
+    </section>
+
+    <div class="cta-wrap no-print">
+      <button id="analyzeBtn" onclick="analyzeResume()">Analyze My Resume →</button>
+    </div>
+
+    <!-- ── SKELETON LOADER ── -->
+    <section id="skeleton" class="skeleton-section hidden" aria-label="Loading">
+      <div class="skel skel-score"></div>
+      <div class="skel-row">
+        <div class="skel skel-block"></div>
+        <div class="skel skel-block"></div>
+      </div>
+      <div class="skel skel-tall"></div>
+      <div class="skel skel-tall"></div>
+    </section>
+
+    <!-- ── ERROR BANNER ── -->
+    <div id="errorMsg" class="error-banner hidden" role="alert">
+      <span class="error-icon">⚠️</span>
+      <span id="errorText"></span>
+      <button class="error-dismiss" onclick="dismissError()" aria-label="Dismiss error">✕</button>
+    </div>
+
+    <!-- ── RESULTS ── -->
+    <section id="results" class="results-section hidden" aria-live="polite">
+
+      <div class="results-toolbar no-print">
+        <button class="btn-ghost" onclick="printResults()">🖨 Export / Print</button>
+      </div>
+
+      <!-- Score -->
+      <div class="score-card">
+        <div class="score-label">Match Score</div>
+        <div id="matchScore" class="score-number">—</div>
+        <div id="scoreTag" class="score-tag"></div>
+      </div>
+
+      <!-- Missing Keywords + Strengths -->
+      <div class="results-grid">
+        <div class="result-block">
+          <h3>⚠️ Missing Keywords</h3>
+          <ul id="missingKeywords"></ul>
+        </div>
+        <div class="result-block">
+          <h3>✅ What's Working</h3>
+          <ul id="strengths"></ul>
+        </div>
+      </div>
+
+      <!-- Feedback Cards -->
+      <div class="feedback-section">
+        <h3>📋 Specific Feedback</h3>
+        <div id="feedbackCards"></div>
+      </div>
+
+      <!-- Rewrites -->
+      <div class="rewrite-section">
+        <h3>✏️ Suggested Rewrites</h3>
+        <div id="rewrites"></div>
+      </div>
+
+      <!-- ATS Breakdown -->
+      <div class="ats-section">
+        <h3>🤖 ATS Compatibility Breakdown</h3>
+        <p class="ats-subtitle">How leading applicant tracking systems would likely score this resume</p>
+        <div id="atsGrid" class="ats-grid"></div>
+      </div>
+
+    </section><!-- /results -->
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p>Built for <strong>World Product Day 2026</strong> · One Woman Ship · Powered by Claude AI</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
