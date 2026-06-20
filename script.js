@@ -2,16 +2,11 @@
 //  TailorCV – script.js
 // =====================
 
-const CLAUDE_API_KEY = "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";
-const CLAUDE_MODEL   = "claude-3-5-haiku-20241022";
+// API key is stored securely in Vercel environment variables — see /api/analyze.js
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (CLAUDE_API_KEY === "YOUR_API_KEY_HERE") {
-    document.getElementById("keyNotice").classList.remove("hidden");
-  }
-
   setupDropZone("resumeDropZone", "resumeFile", "resume", "resumeFilename");
   setupDropZone("jdDropZone",     "jdFile",     "jobdesc", "jdFilename");
   setupCounter("resume",  "resumeCounter");
@@ -161,61 +156,29 @@ async function analyzeResume() {
     return;
   }
 
-  if (CLAUDE_API_KEY === "YOUR_API_KEY_HERE") {
-    showError("No API key found. Open script.js and replace YOUR_API_KEY_HERE with your Claude API key.");
-    return;
-  }
-
   dismissError();
   document.getElementById("results").classList.add("hidden");
   document.getElementById("skeleton").classList.remove("hidden");
   document.getElementById("analyzeBtn").disabled = true;
 
   try {
-    const prompt = buildPrompt(resume, jobdesc);
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("/api/analyze", {
       method: "POST",
-      headers: {
-        "x-api-key":         CLAUDE_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "content-type":      "application/json",
-        "anthropic-dangerous-direct-browser-access": "true"
-      },
-      body: JSON.stringify({
-        model:      CLAUDE_MODEL,
-        max_tokens: 2000,
-        messages: [{ role: "user", content: prompt }]
-      })
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ resume, jobdesc })
     });
 
     if (!response.ok) {
       let errMsg = `API error ${response.status}`;
       try {
         const errJson = await response.json();
-        errMsg = errJson.error?.message || errMsg;
-        if (response.status === 401) errMsg = "Invalid API key. Check your key in script.js.";
+        errMsg = errJson.error || errMsg;
         if (response.status === 429) errMsg = "Rate limit hit. Wait a moment and try again.";
-      } catch (_) { /* ignore parse error */ }
+      } catch (_) { /* ignore */ }
       throw new Error(errMsg);
     }
 
-    const data    = await response.json();
-    const rawText = data.content?.[0]?.text?.trim() ?? "";
-
-    // Strip optional markdown code fences
-    const jsonStr = rawText
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/```\s*$/, "")
-      .trim();
-
-    let result;
-    try {
-      result = JSON.parse(jsonStr);
-    } catch (_) {
-      throw new Error("The AI returned an unexpected format. Please try again.");
-    }
-
+    const result = await response.json();
     renderResults(result);
 
   } catch (err) {
